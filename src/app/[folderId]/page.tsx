@@ -1,9 +1,13 @@
-import React from 'react'
+"use client";
 
-function page() {
+import InActiveNote from "@/components/notes/InActiveNote";
+
+const FolderNotes = () => {
   return (
-    <div>page</div>
-  )
-}
+    <>
+      <InActiveNote />
+    </>
+  );
+};
 
-export default page
+export default FolderNotes;

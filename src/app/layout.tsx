@@ -1,7 +1,6 @@
 "use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NoteContainer from "@/components/notes/NoteContainer";
 import { Stack } from "@mui/material";
 import SideLayout from "@/components/sidebar/SideLayout";
 import { useState } from "react";
@@ -30,7 +29,6 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <Stack direction="row" height="100%" width="100%">
             <SideLayout />
-            <NoteContainer />
             {children}
           </Stack>
         </QueryClientProvider>

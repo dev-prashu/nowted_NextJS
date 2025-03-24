@@ -1,9 +1,9 @@
 import axios from "axios";
-import { folder } from "../types/folder";
+import { FolderType } from "../types/folder";
 
 const API_URL: string = "https://nowted-server.remotestate.com";
 
-export const getFolders = async (): Promise<folder[]> => {
+export const getFolders = async (): Promise<FolderType[]> => {
   try {
     const response = await axios.get(`${API_URL}/folders`);
     return response.data.folders;
@@ -12,7 +12,7 @@ export const getFolders = async (): Promise<folder[]> => {
   }
 };
 
-export const createFolder = async (folder: Partial<folder>) => {
+export const createFolder = async (folder: Partial<FolderType>) => {
   try {
     await axios.post(`${API_URL}/folders`, folder);
   } catch (err) {
@@ -20,7 +20,7 @@ export const createFolder = async (folder: Partial<folder>) => {
   }
 };
 
-export const updateFolder = async (id: string, folder: Partial<folder>) => {
+export const updateFolder = async (id: string, folder: Partial<FolderType>) => {
   try {
     await axios.patch(`${API_URL}/folders/${id}`, folder);
   } catch (err) {

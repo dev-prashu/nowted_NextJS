@@ -1,7 +1,7 @@
 import axios from "axios";
-import {Note} from "../types/note"
+import { Note } from "../types/note";
+import { pageParams } from "@/types/pageParams";
 const API_URL: string = "https://nowted-server.remotestate.com";
-
 
 //Fetch Recent Notes
 export const getRecentNotes = async (): Promise<Note[]> => {
@@ -14,12 +14,22 @@ export const getRecentNotes = async (): Promise<Note[]> => {
 };
 
 //Fetch all notes
-export const getNotes = async (): Promise<Note[]> => {
+export const getNotes = async (params: pageParams): Promise<Note[]> => {
   try {
-    const response = await axios.get(`${API_URL}/notes`);
+    const response = await axios.get(`${API_URL}/notes`, { params });
     return response.data.notes;
   } catch (err) {
     throw new Error(`Unable to fetch notes : ${err}`);
+  }
+};
+
+//Fetch Note By Id
+export const getNoteById = async (id: string): Promise<Note> => {
+  try {
+    const response = await axios.get(`${API_URL}/notes/${id}`);
+    return response.data.note;
+  } catch (err) {
+    throw new Error(`Unable to fetch note : ${err}`);
   }
 };
 

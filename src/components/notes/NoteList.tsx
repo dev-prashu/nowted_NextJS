@@ -1,50 +1,69 @@
+"use client";
 import { getNotes } from "@/api/noteApi";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 function NoteList() {
-  const { data: notes } = useQuery({
-    queryKey: ["notes"],
-    queryFn: getNotes,
+  const { folderId }: { folderId: string } = useParams();
+  const router = useRouter();
+
+  const { data: notes, isPending } = useQuery({
+    queryKey: ["notes", folderId],
+    queryFn: () => getNotes({ page: 1, limit: 10, folderId }),
   });
 
+  if (isPending) {
+    return (
+      <Stack height="100vh" alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </Stack>
+    );
+  }
+
   return (
-    <Box>
-      {notes?.map((note) => (
-        <Box
-          key={note.id}
-          border={2}
-          padding={2}
-          borderRadius={2}
-          marginBottom={2}
-          display="flex"
-          flexDirection="column"
-          gap={2}
-         
-        >
-          <Typography variant="h6" fontWeight="bold" color="white">
-            {note.title}
-          </Typography>
+    <Stack spacing={2} width="100%">
+      <Typography variant="h5" fontWeight="bold" color="white">
+        {notes?.[0]?.folder?.name || "No Folder Selected"}
+      </Typography>
+
+      {notes?.length ? (
+        notes.map((note) => (
           <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
+            key={note.id}
+            sx={{
+              padding: 2,
+              borderRadius: 2,
+              bgcolor: "black",
+              color: "white",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              router.push(`/${folderId}/${note.id}`);
+            }}
           >
-            <Typography variant="body1" color="white">
-              {new Date(note.createdAt).toLocaleDateString()}
+            <Typography variant="h6" fontWeight="bold">
+              {note.title}
             </Typography>
-            <Typography variant="body1" color="white" fontStyle="italic">
-              {note.preview
-                ? note.preview.length > 20
-                  ? note.preview.slice(0, 20) + "..."
-                  : note.preview
-                : ""}
-            </Typography>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2">
+                {new Date(note.createdAt).toLocaleDateString()}
+              </Typography>
+              <Typography variant="body2" fontStyle="italic">
+                {note.preview?.slice(0, 20) || "No preview"}...
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      ))}
-    </Box>
+        ))
+      ) : (
+        <Typography color="textSecondary">No notes available.</Typography>
+      )}
+    </Stack>
   );
 }
 

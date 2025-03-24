@@ -1,7 +1,16 @@
 import { getRecentNotes } from "@/api/noteApi";
 import { Note } from "@/types/note";
 import { Description } from "@mui/icons-material";
-import { Stack, Typography, Box, CircularProgress } from "@mui/material";
+
+import {
+  Stack,
+  Typography,
+  CircularProgress,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 
 import React from "react";
@@ -14,11 +23,16 @@ function RecentNotes() {
   } = useQuery<Note[]>({
     queryKey: ["recent"],
     queryFn: getRecentNotes,
+    
   });
 
   if (isPending) {
-    return <CircularProgress />;
-  }
+      return (
+        <Stack alignItems="center" justifyContent="center">
+          <CircularProgress />
+        </Stack>
+      );
+    }
   if (isError) {
     return <Typography color="error">Failed to load notes</Typography>;
   }
@@ -26,29 +40,24 @@ function RecentNotes() {
   return (
     <Stack>
       <Typography>Recents</Typography>
-      {notes?.map((note) => (
-        <Box
-          key={note.id}
-          display="flex"
-          alignItems="center"
-          gap={2}
-          paddingTop={2}
-        >
-          <Description />
-          <Typography
-            component="span"
+      <List>
+        {notes?.map((note) => (
+          <ListItemButton
+            key={note.id}
             sx={{
-              cursor: "pointer",
-              color: "white",
-              ":hover": {
-                color: "lightblue",
-              },
+              padding: "0",
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
             }}
           >
-            {note.title}
-          </Typography>
-        </Box>
-      ))}
+            <ListItemIcon>
+              <Description sx={{ color: "white" }} />
+            </ListItemIcon>
+            <ListItemText primary={note.title} />
+          </ListItemButton>
+        ))}
+      </List>
     </Stack>
   );
 }
