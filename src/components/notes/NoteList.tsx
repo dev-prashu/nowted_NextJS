@@ -1,21 +1,64 @@
 "use client";
+
 import { getNotes } from "@/api/noteApi";
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { Note } from "@/types/note";
+import { pageParams } from "@/types/pageParams";
+import {
+  Box,
+  CircularProgress,
+  Stack,
+  Typography,
+  Button,
+} from "@mui/material";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 function NoteList() {
   const { folderId }: { folderId: string } = useParams();
   const router = useRouter();
+  const limit = 10;
 
-  const { data: notes, isPending } = useQuery({
-    queryKey: ["notes", folderId],
-    queryFn: () => getNotes({ page: 1, limit: 10, folderId }),
-  });
+  const fetchNotes = async ({ pageParam = 1 }): Promise<Note[]> => {
+    const param: pageParams = { page: pageParam, limit };
+    if (folderId === "favorite") {
+      param.favorite = true;
+    } else if (folderId === "trash") {
+      param.deleted = true;
+    } else if (folderId === "archive") {
+      param.archived = true;
+    } else {
+      param.folderId = folderId;
+    }
 
-  if (isPending) {
+    const response = await getNotes(param);
+    return response;
+  };
+
+  const {
+    data,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    {
+      queryKey: ["notes", folderId],
+      queryFn: fetchNotes,
+      initialPageParam:1,
+      getNextPageParam:(lastPage,allPages)=> lastPage.length<10 ? undefined : allPages.length+1,
+    }
+  );
+
+  const loadMore = () => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  const notes = data?.pages.flat(); 
+
+  if (isLoading) {
     return (
       <Stack height="100vh" alignItems="center" justifyContent="center">
         <CircularProgress />
@@ -23,16 +66,32 @@ function NoteList() {
     );
   }
 
+  if (notes?.length === 0) {
+    return (
+      <Stack height="100vh" alignItems="center" justifyContent="center">
+        <Typography variant="h5" fontWeight="bold" color="white">
+          No Notes Found
+        </Typography>
+      </Stack>
+    );
+  }
+
   return (
     <Stack spacing={2} width="100%">
       <Typography variant="h5" fontWeight="bold" color="white">
-        {notes?.[0]?.folder?.name || "No Folder Selected"}
+        {folderId === "favorite"
+          ? "Favorites"
+          : folderId === "trash"
+          ? "Trash"
+          : folderId === "archive"
+          ? "Archived"
+          : notes?.[0]?.folder?.name}
       </Typography>
 
       {notes?.length ? (
         notes.map((note) => (
           <Box
-            key={note.id}
+            key={`${note.id}`}
             sx={{
               padding: 2,
               borderRadius: 2,
@@ -61,7 +120,17 @@ function NoteList() {
           </Box>
         ))
       ) : (
-        <Typography color="textSecondary">No notes available.</Typography>
+        <Typography color="white">No notes available.</Typography>
+      )}
+
+      {hasNextPage && (
+        <Button
+          variant="contained"
+          onClick={loadMore}
+          disabled={isFetchingNextPage}
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </Button>
       )}
     </Stack>
   );

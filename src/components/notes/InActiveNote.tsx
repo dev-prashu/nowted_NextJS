@@ -9,10 +9,8 @@ export default function InActiveNote() {
         color="white"
         width="70%"
         alignItems="center"
-        display="flex"
-        flexDirection="column"
         justifyContent="center"
-        height="100vh"
+        flexDirection={"column"}
       >
         <DescriptionIcon sx={{ fontSize: 50 }} />
         <Typography variant="h5" fontWeight="bold">Select a note to view</Typography>

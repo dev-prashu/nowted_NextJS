@@ -27,7 +27,7 @@ export default function RootLayout({
       <title>Nowted</title>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <QueryClientProvider client={queryClient}>
-          <Stack direction="row" height="100%" width="100%">
+          <Stack direction="row" height="100%" width="100%"  bgcolor="black">
             <SideLayout />
             {children}
           </Stack>

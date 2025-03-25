@@ -36,7 +36,8 @@ export const getNoteById = async (id: string): Promise<Note> => {
 //Create a note
 export const createNote = async (note: Partial<Note>) => {
   try {
-    await axios.post(`${API_URL}/notes`, note);
+    const response=await axios.post(`${API_URL}/notes`, note);
+    return response.data.id;
   } catch (err) {
     throw new Error(`Unable to create note : ${err}`);
   }
@@ -63,7 +64,7 @@ export const deleteNote = async (id: string) => {
 //Restore a note by Id
 export const restoreNote = async (id: string) => {
   try {
-    await axios.post(`${API_URL}/notes/${id}`);
+    await axios.post(`${API_URL}/notes/${id}/restore`);
   } catch (err) {
     throw new Error(`Unable to restore a note : ${err}`);
   }

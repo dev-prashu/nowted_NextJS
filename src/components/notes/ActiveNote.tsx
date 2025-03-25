@@ -10,7 +10,7 @@ import {
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNoteById, updateNote } from "@/api/noteApi";
 import { Note } from "@/types/note";
 import { useEffect, useRef, useState } from "react";
@@ -18,11 +18,13 @@ import Options from "./Dropdown";
 import RestoreNote from "./RestoreNote";
 
 export default function ActiveNote() {
-  const { noteId }: { noteId: string } = useParams();
+  const { noteId, folderId }: { noteId: string; folderId: string } =
+    useParams();
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [isDeleted, setisDeleted] = useState<boolean>(false);
 
   const { data: note } = useQuery({
     queryKey: ["note", noteId],
@@ -30,10 +32,13 @@ export default function ActiveNote() {
       return await getNoteById(noteId);
     },
   }) as { data: Note };
-
+  const queryClient = useQueryClient();
   const updateMutation = useMutation({
     mutationFn: (updatedNote: { title: string; content: string }) =>
       updateNote(noteId, updatedNote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
+    },
   });
 
   const handleUpdate = (updateTitle: string, updatedContent: string) => {
@@ -61,14 +66,14 @@ export default function ActiveNote() {
       setContent(note.content);
     }
   }, [note]);
-
-  if (note?.deletedAt) {
+  if (note?.deletedAt || isDeleted) {
     return (
       <>
-        <RestoreNote noteId={note?.id} />
+        <RestoreNote note={note} setisDeleted={setisDeleted} />
       </>
     );
   }
+
   return (
     <>
       <Stack
@@ -99,21 +104,23 @@ export default function ActiveNote() {
         </Box>
         <Box
           display="flex"
-          justifyContent="space-between"
           alignItems={"center"}
-          width="25%"
+          justifyContent={"space-between"}
+          width="20%"
         >
           <Typography variant="body1">Date</Typography>
           <Typography variant="body1">
             {note?.createdAt && new Date(note.createdAt).toLocaleDateString()}
           </Typography>
         </Box>
-        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)" }} />
+        <Divider
+          sx={{ borderColor: "rgba(255, 255, 255, 0.1)", border: "solid 1px" }}
+        />
         <Box
           display="flex"
-          justifyContent="space-between"
           alignItems={"center"}
           width="25%"
+          justifyContent={"space-between"}
         >
           <Typography variant="body1">Folder</Typography>
           <Typography variant="body1">{note?.folder.name}</Typography>
@@ -136,6 +143,7 @@ export default function ActiveNote() {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
         note={note}
+        setisDeleted={setisDeleted}
       />
     </>
   );

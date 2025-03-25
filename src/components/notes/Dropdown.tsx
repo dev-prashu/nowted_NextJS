@@ -1,8 +1,9 @@
 import React from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { Note } from "@/types/note";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteNote, updateNote } from "@/api/noteApi";
+import { useParams } from "next/navigation";
 
 // Dropdown component that shows options
 export default function Options({
@@ -10,12 +11,15 @@ export default function Options({
   open,
   onClose,
   note,
+  setisDeleted,
 }: {
   anchorEl: HTMLElement | null;
   open: boolean;
   onClose: () => void;
   note: Note;
+  setisDeleted: (value: boolean) => void;
 }) {
+  const {folderId}=useParams();
   const updateMutation = useMutation({
     mutationFn: (updatedNote: {
       isFavorite: boolean;
@@ -23,9 +27,13 @@ export default function Options({
       deletedAt: string;
     }) => updateNote(note?.id, updatedNote),
   });
+  const queryClient=useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteNote(note?.id),
+    onSuccess:()=>{
+      queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
+    }
   });
 
   const handleFavorite = () => {
@@ -39,6 +47,7 @@ export default function Options({
 
   const handleDelete = () => {
     deleteMutation.mutate();
+    setisDeleted(true);
     onClose();
   };
   return (

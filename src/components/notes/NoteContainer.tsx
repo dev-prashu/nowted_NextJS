@@ -15,6 +15,8 @@ function NoteContainer() {
       padding={2}
       gap={2}
       overflow="auto"
+      display="flex"
+      flexDirection="column"
     >
       {folderId ? (
         <NoteList />

@@ -1,4 +1,3 @@
-"use client";
 import {
   createFolder,
   deleteFolder,
@@ -21,7 +20,7 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function FolderList() {
   const queryClient = useQueryClient();
@@ -34,6 +33,7 @@ function FolderList() {
     queryKey: ["folders"],
     queryFn: getFolders,
   });
+
   const deleteMutation = useMutation({
     mutationFn: deleteFolder,
     onSuccess: () => {
@@ -59,6 +59,8 @@ function FolderList() {
   const router = useRouter();
   const [editFolderId, setEditFolderId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState<string>("");
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null); 
 
   const handleDoubleClick = (folderId: string, folderName: string) => {
     setEditFolderId(folderId);
@@ -69,9 +71,23 @@ function FolderList() {
     const folder: Partial<FolderType> = { name: newFolderName };
     updateMutation.mutate({ id: folderId, folder });
   };
+
   const handleBlur = () => {
     setEditFolderId(null);
   };
+
+  const handleCreateFolder = () => {
+    const folder: Partial<FolderType> = { name: newFolderName };
+    createMutation.mutate(folder);
+    setIsCreatingFolder(false);
+  };
+
+  
+  useEffect(() => {
+    if (folders && folders.length > 0) {
+      router.push(`/${folders[0].id}`);
+    }
+  }, [folders, router]);
 
   if (isPending) {
     return (
@@ -84,17 +100,51 @@ function FolderList() {
   if (isError) {
     return <Typography>{error.message}</Typography>;
   }
+
   return (
     <>
-      <Stack gap={2}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+      <Stack spacing={1}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          width="100%"
+        >
           <Typography>Folders</Typography>
-          <IconButton sx={{color:"white"}}>
+          <IconButton
+            sx={{ color: "white" }}
+            onClick={() => setIsCreatingFolder((prev) => !prev)}
+          >
             <CreateNewFolder />
           </IconButton>
         </Box>
+        {isCreatingFolder && (
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            width="100%"
+          >
+            <Input
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleCreateFolder();
+                }
+              }}
+              autoFocus
+              fullWidth
+              sx={{
+                color: "white",
+                marginBottom: "10px",
+              }}
+            />
+          </Box>
+        )}
 
-        <List sx={{ overflowY: "auto", maxHeight: "240px" }}>
+        <List sx={{ overflowY: "auto", maxHeight: "240px", gap: "10px" }}>
           {folders?.map((folder) => (
             <ListItemButton
               key={folder.id}
@@ -103,8 +153,10 @@ function FolderList() {
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
+                backgroundColor: selectedFolderId === folder.id ? "blue" : "transparent"
               }}
               onClick={() => {
+                setSelectedFolderId(folder.id); 
                 router.push(`/${folder.id}`);
               }}
               onDoubleClick={() => handleDoubleClick(folder.id, folder.name)}

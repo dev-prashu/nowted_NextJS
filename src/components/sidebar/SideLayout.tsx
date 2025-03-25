@@ -9,7 +9,6 @@ function SideLayout() {
   return (
     <Stack
       width="25%"
-      height="100vh"
       padding={2}
       gap={2}
       display="flex"
