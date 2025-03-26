@@ -73,7 +73,8 @@ export const restoreNote = async (id: string) => {
 //Search Note
 export const searchQuery = async (query: string) => {
   try {
-    await axios.get(`${API_URL}/notes?search=${query}`);
+    const response=await axios.get(`${API_URL}/notes?search=${query}`);
+    return response.data.notes;
   } catch (err) {
     throw new Error(`Unable to search note : ${err}`);
   }

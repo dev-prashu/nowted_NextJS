@@ -12,9 +12,6 @@ function NoteContainer() {
       height="100vh"
       bgcolor="#1C1C1C"
       width="30%"
-      padding={2}
-      gap={2}
-      overflow="auto"
       display="flex"
       flexDirection="column"
     >

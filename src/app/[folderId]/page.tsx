@@ -5,6 +5,7 @@ import InActiveNote from "@/components/notes/InActiveNote";
 const FolderNotes = () => {
   return (
     <>
+    
       <InActiveNote />
     </>
   );

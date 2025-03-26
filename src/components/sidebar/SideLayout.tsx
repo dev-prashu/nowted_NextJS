@@ -9,11 +9,10 @@ function SideLayout() {
   return (
     <Stack
       width="25%"
-      padding={2}
-      gap={2}
+      height="100%"
+      paddingX={2}
       display="flex"
       flexDirection="column"
-      rowGap={2}
       bgcolor="black"
       color="white"
     >

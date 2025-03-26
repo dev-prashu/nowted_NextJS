@@ -19,10 +19,11 @@ import {
   IconButton,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 function FolderList() {
+  const { folderId } = useParams();
   const queryClient = useQueryClient();
   const {
     data: folders,
@@ -60,7 +61,13 @@ function FolderList() {
   const [editFolderId, setEditFolderId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState<string>("");
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null); 
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!folderId && folders && folders.length > 0) {
+      router.push(`/${folders?.[0]?.id}`);
+    }
+  }, [folders, router, folderId]);
 
   const handleDoubleClick = (folderId: string, folderName: string) => {
     setEditFolderId(folderId);
@@ -82,13 +89,6 @@ function FolderList() {
     setIsCreatingFolder(false);
   };
 
-  
-  useEffect(() => {
-    if (folders && folders.length > 0) {
-      router.push(`/${folders[0].id}`);
-    }
-  }, [folders, router]);
-
   if (isPending) {
     return (
       <Stack alignItems="center" justifyContent="center">
@@ -103,7 +103,7 @@ function FolderList() {
 
   return (
     <>
-      <Stack spacing={1}>
+      <Stack sx={{ overflowY: "auto" }}>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -138,13 +138,12 @@ function FolderList() {
               fullWidth
               sx={{
                 color: "white",
-                marginBottom: "10px",
               }}
             />
           </Box>
         )}
 
-        <List sx={{ overflowY: "auto", maxHeight: "240px", gap: "10px" }}>
+        <List sx={{ overflowY: "auto", gap: "10px" }}>
           {folders?.map((folder) => (
             <ListItemButton
               key={folder.id}
@@ -153,10 +152,13 @@ function FolderList() {
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                backgroundColor: selectedFolderId === folder.id ? "blue" : "transparent"
+                backgroundColor:
+                  selectedFolderId === folder.id && folderId === folder.id
+                    ? "blue"
+                    : "transparent",
               }}
               onClick={() => {
-                setSelectedFolderId(folder.id); 
+                setSelectedFolderId(folder.id);
                 router.push(`/${folder.id}`);
               }}
               onDoubleClick={() => handleDoubleClick(folder.id, folder.name)}

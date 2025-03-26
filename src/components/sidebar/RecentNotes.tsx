@@ -12,6 +12,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import React from "react";
 
@@ -23,16 +24,16 @@ function RecentNotes() {
   } = useQuery<Note[]>({
     queryKey: ["recent"],
     queryFn: getRecentNotes,
-    
   });
+  const router = useRouter();
 
   if (isPending) {
-      return (
-        <Stack alignItems="center" justifyContent="center">
-          <CircularProgress />
-        </Stack>
-      );
-    }
+    return (
+      <Stack alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </Stack>
+    );
+  }
   if (isError) {
     return <Typography color="error">Failed to load notes</Typography>;
   }
@@ -49,6 +50,9 @@ function RecentNotes() {
               display: "flex",
               justifyContent: "space-between",
               width: "100%",
+            }}
+            onClick={() => {
+              router.push(`/${note.folderId}/${note.id}`);
             }}
           >
             <ListItemIcon>

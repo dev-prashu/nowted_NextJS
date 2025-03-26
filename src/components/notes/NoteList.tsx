@@ -35,20 +35,14 @@ function NoteList() {
     return response;
   };
 
-  const {
-    data,
-    isLoading,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
-    {
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
       queryKey: ["notes", folderId],
       queryFn: fetchNotes,
-      initialPageParam:1,
-      getNextPageParam:(lastPage,allPages)=> lastPage.length<10 ? undefined : allPages.length+1,
-    }
-  );
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length < 10 ? undefined : allPages.length + 1,
+    });
 
   const loadMore = () => {
     if (hasNextPage) {
@@ -56,7 +50,7 @@ function NoteList() {
     }
   };
 
-  const notes = data?.pages.flat(); 
+  const notes = data?.pages.flat();
 
   if (isLoading) {
     return (
@@ -77,8 +71,15 @@ function NoteList() {
   }
 
   return (
-    <Stack spacing={2} width="100%">
-      <Typography variant="h5" fontWeight="bold" color="white">
+    <Stack
+      width="100%"
+      height="100%"
+      flexDirection="column"
+      display="flex"
+      paddingBottom={2}
+      sx={{ overflow: "hidden" }}
+    >
+      <Typography variant="h5" fontWeight="bold" color="white" paddingTop={2} paddingLeft={2} paddingBottom={2}>
         {folderId === "favorite"
           ? "Favorites"
           : folderId === "trash"
@@ -88,50 +89,77 @@ function NoteList() {
           : notes?.[0]?.folder?.name}
       </Typography>
 
-      {notes?.length ? (
-        notes.map((note) => (
-          <Box
-            key={`${note.id}`}
-            sx={{
-              padding: 2,
-              borderRadius: 2,
-              bgcolor: "black",
-              color: "white",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-              cursor: "pointer",
-            }}
-            onClick={() => {
-              router.push(`/${folderId}/${note.id}`);
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold">
-              {note.title}
-            </Typography>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="body2">
-                {new Date(note.createdAt).toLocaleDateString()}
+      <Stack
+        overflow="auto"
+        gap={2}
+        paddingX={2}
+        display="flex"
+        flexDirection="column"
+        flexGrow={1}
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: "8px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#555",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: "#777",
+          },
+        }}
+      >
+        {notes?.length ? (
+          notes.map((note) => (
+            <Box
+              key={`${note.id}`}
+              sx={{
+                padding: 2,
+                borderRadius: 2,
+                bgcolor: "black",
+                color: "white",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                cursor: "pointer",
+                "&:hover": {
+                  bgcolor: "#222",
+                },
+              }}
+              onClick={() => {
+                router.push(`/${folderId}/${note.id}`);
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                {note.title}
               </Typography>
-              <Typography variant="body2" fontStyle="italic">
-                {note.preview?.slice(0, 20) || "No preview"}...
-              </Typography>
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="body2">
+                  {new Date(note.createdAt).toLocaleDateString()}
+                </Typography>
+                <Typography variant="body2" fontStyle="italic">
+                  {note.preview?.slice(0, 20) || "No preview"}...
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-        ))
-      ) : (
-        <Typography color="white">No notes available.</Typography>
-      )}
+          ))
+        ) : (
+          <Typography color="white">No notes available.</Typography>
+        )}
 
-      {hasNextPage && (
-        <Button
-          variant="contained"
-          onClick={loadMore}
-          disabled={isFetchingNextPage}
-        >
-          {isFetchingNextPage ? "Loading..." : "Load More"}
-        </Button>
-      )}
+        {hasNextPage && (
+          <Button
+            variant="contained"
+            onClick={loadMore}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? "Loading..." : "Load More"}
+          </Button>
+        )}
+      </Stack>
     </Stack>
   );
 }

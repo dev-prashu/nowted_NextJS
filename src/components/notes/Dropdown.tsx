@@ -1,11 +1,12 @@
+"use Client";
 import React from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { Note } from "@/types/note";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteNote, updateNote } from "@/api/noteApi";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-// Dropdown component that shows options
 export default function Options({
   anchorEl,
   open,
@@ -19,21 +20,26 @@ export default function Options({
   note: Note;
   setisDeleted: (value: boolean) => void;
 }) {
-  const {folderId}=useParams();
+  const { folderId } = useParams();
+  const router = useRouter();
+
   const updateMutation = useMutation({
     mutationFn: (updatedNote: {
       isFavorite: boolean;
       isArchived: boolean;
       deletedAt: string;
     }) => updateNote(note?.id, updatedNote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
+    },
   });
-  const queryClient=useQueryClient();
+  const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteNote(note?.id),
-    onSuccess:()=>{
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
-    }
+    },
   });
 
   const handleFavorite = () => {
@@ -42,6 +48,8 @@ export default function Options({
   };
   const handleArchive = () => {
     updateMutation.mutate({ ...note, isArchived: !note?.isArchived });
+
+    router.push(`/${folderId}`);
     onClose();
   };
 
