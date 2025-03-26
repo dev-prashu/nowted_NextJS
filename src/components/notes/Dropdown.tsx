@@ -31,7 +31,7 @@ export default function Options({
     }) => updateNote(note?.id, updatedNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
-      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ["note", note?.id] });
     },
   });
   const queryClient = useQueryClient();
@@ -74,7 +74,6 @@ export default function Options({
       <MenuItem
         onClick={() => {
           handleFavorite();
-          console.log(note?.isFavorite);
         }}
       >
         {note?.isFavorite ? "Remove from Favorites" : "Add to Favorites"}

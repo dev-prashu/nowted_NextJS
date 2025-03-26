@@ -63,6 +63,7 @@ export default function ActiveNote() {
     }) => updateNote(noteId, updatedNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
+      queryClient.invalidateQueries({ queryKey: ["note", noteId] });
     },
   });
 
@@ -193,7 +194,7 @@ export default function ActiveNote() {
               id="select-folder"
               value={selectedFolderId}
               onChange={handleFolderChange}
-              sx={{ color: "white"}}
+              sx={{ color: "white" }}
               MenuProps={{
                 PaperProps: {
                   style: {
@@ -215,8 +216,20 @@ export default function ActiveNote() {
         </Box>
         <Box
           sx={{
-            flexGrow: 1,
             overflow: "auto",
+            "&::-webkit-scrollbar": {
+              width: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#555",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              backgroundColor: "#777",
+            },
           }}
           paddingTop={2}
         >
@@ -225,12 +238,6 @@ export default function ActiveNote() {
             multiline
             fullWidth
             disableUnderline
-            sx={{
-              height: "100%",
-              "& .MuiInputBase-input": {
-                minHeight: "100%",
-              },
-            }}
             onChange={(e) => handleUpdate(title, e.target.value)}
           />
         </Box>

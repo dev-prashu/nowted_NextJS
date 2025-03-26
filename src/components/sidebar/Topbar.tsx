@@ -50,7 +50,12 @@ function Topbar() {
   };
 
   return (
-    <Stack gap={2} paddingTop={1} alignItems="center" justifyContent="space-between">
+    <Stack
+      gap={2}
+      paddingTop={1}
+      alignItems="center"
+      justifyContent="space-between"
+    >
       <Stack
         direction="row"
         alignItems="center"
@@ -82,15 +87,12 @@ function Topbar() {
               sx={{
                 position: "absolute",
                 top: "100%",
-                left: 0,
-                right: 0,
                 zIndex: 1,
                 backgroundColor: "black",
                 maxHeight: "220px",
                 overflowY: "auto",
                 width: "100%",
                 borderRadius: "4px",
-                mt: 1,
                 border: "1px solid #333",
               }}
             >
