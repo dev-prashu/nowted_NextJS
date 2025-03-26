@@ -15,7 +15,7 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 function NoteList() {
-  const { folderId }: { folderId: string } = useParams();
+  const { folderId,noteId }: { folderId: string,noteId:string } = useParams();
   const router = useRouter();
   const limit = 10;
 
@@ -119,7 +119,7 @@ function NoteList() {
               sx={{
                 padding: 2,
                 borderRadius: 2,
-                bgcolor: "black",
+                bgcolor: noteId==note.id?"blue":"black",
                 color: "white",
                 display: "flex",
                 flexDirection: "column",
@@ -128,10 +128,13 @@ function NoteList() {
                 "&:hover": {
                   bgcolor: "#222",
                 },
+                
               }}
+
               onClick={() => {
                 router.push(`/${folderId}/${note.id}`);
               }}
+              
             >
               <Typography variant="h6" fontWeight="bold">
                 {note.title}

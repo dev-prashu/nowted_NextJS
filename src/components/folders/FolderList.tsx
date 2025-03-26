@@ -5,6 +5,7 @@ import {
   updateFolder,
 } from "@/api/folderApi";
 import { FolderType } from "@/types/folder";
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { CreateNewFolder, Delete, Folder } from "@mui/icons-material";
 import {
   Box,
@@ -61,7 +62,6 @@ function FolderList() {
   const [editFolderId, setEditFolderId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState<string>("");
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!folderId && folders && folders.length > 0) {
@@ -148,23 +148,20 @@ function FolderList() {
             <ListItemButton
               key={folder.id}
               sx={{
-                padding: "0",
+                padding: "4px",
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
                 backgroundColor:
-                  selectedFolderId === folder.id && folderId === folder.id
-                    ? "blue"
-                    : "transparent",
+                  folderId === folder.id ? "blue" : "transparent",
               }}
               onClick={() => {
-                setSelectedFolderId(folder.id);
                 router.push(`/${folder.id}`);
               }}
               onDoubleClick={() => handleDoubleClick(folder.id, folder.name)}
             >
-              <ListItemIcon>
-                <Folder sx={{ color: "white" }} />
+              <ListItemIcon sx={{ color: "white" }}>
+                {folderId===folder.id?<FolderOpenIcon/>:<Folder/>}
               </ListItemIcon>
               {editFolderId === folder.id ? (
                 <Input

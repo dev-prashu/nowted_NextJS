@@ -31,6 +31,7 @@ export default function Options({
     }) => updateNote(note?.id, updatedNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
     },
   });
   const queryClient = useQueryClient();

@@ -12,6 +12,8 @@ import {
   styled,
   Typography,
 } from "@mui/material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useParams, useRouter } from "next/navigation";
@@ -29,8 +31,7 @@ const InputArea = styled(Input)({
     fontSize: "20px",
     height: "100%",
     overflow: "auto",
-    padding:"10px",
-    paddingBottom:"20px",
+    paddingBottom: "20px",
   },
 });
 
@@ -117,14 +118,14 @@ export default function ActiveNote() {
   return (
     <>
       <Stack
-        height="100vh" // Changed to viewport height
+        height="100vh"
         bgcolor="black"
         width="70%"
         color="white"
         gap={2}
         padding={2}
         sx={{
-          overflow: "hidden", // Prevent outer container from scrolling
+          overflow: "hidden",
         }}
       >
         <Box
@@ -153,7 +154,16 @@ export default function ActiveNote() {
           justifyContent={"space-between"}
           width="20%"
         >
-          <Typography variant="body1">Date</Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            height="fit-content"
+            gap={1}
+          >
+            <CalendarMonthIcon />
+            <Typography variant="body1">Date</Typography>
+          </Box>
           <Typography variant="body1">
             {note?.createdAt && new Date(note.createdAt).toLocaleDateString()}
           </Typography>
@@ -168,18 +178,29 @@ export default function ActiveNote() {
           width="fit-content"
           justifyContent={"space-between"}
         >
-          <Typography variant="body1">Folder</Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            height="fit-content"
+            gap={1}
+          >
+            <FolderOpenIcon />
+            <Typography variant="body1">Folder</Typography>
+          </Box>
           <FormControl variant="standard" fullWidth>
             <Select
               id="select-folder"
               value={selectedFolderId}
               onChange={handleFolderChange}
-              sx={{ color: "white" }}
+              sx={{ color: "white"}}
               MenuProps={{
                 PaperProps: {
                   style: {
                     maxHeight: 200,
                     overflow: "auto",
+                    backgroundColor: "black",
+                    color: "white",
                   },
                 },
               }}
@@ -196,9 +217,8 @@ export default function ActiveNote() {
           sx={{
             flexGrow: 1,
             overflow: "auto",
-           
           }}
-          padding={2}
+          paddingTop={2}
         >
           <InputArea
             defaultValue={content}
@@ -210,7 +230,6 @@ export default function ActiveNote() {
               "& .MuiInputBase-input": {
                 minHeight: "100%",
               },
-             
             }}
             onChange={(e) => handleUpdate(title, e.target.value)}
           />

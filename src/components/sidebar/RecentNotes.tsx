@@ -39,7 +39,7 @@ function RecentNotes() {
   }
 
   return (
-    <Stack>
+    <Stack paddingTop={2}>
       <Typography>Recents</Typography>
       <List>
         {notes?.map((note) => (
