@@ -2,6 +2,7 @@ import axios from "axios";
 import { Note } from "../types/note";
 import { pageParams } from "@/types/pageParams";
 const API_URL: string = "https://nowted-server.remotestate.com";
+// const API_URL:string="http://localhost:3000/api"
 
 //Fetch Recent Notes
 export const getRecentNotes = async (): Promise<Note[]> => {
