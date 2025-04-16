@@ -6,13 +6,25 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const noteId=  params.id;
   try {
-    const noteId = params.id;
-    const result = await pool.query("SELECT * FROM notes where noteid = $1", [
-      noteId,
-    ]);
-    return NextResponse.json({ note: result.rows[0] }, { status: 200 });
-  } catch (error) {
+    const noteResult = await pool.query("SELECT * FROM notes WHERE noteid = $1", [noteId]);
+
+    if (noteResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Note not found' }, { status: 404 });
+    }
+
+    const note = noteResult.rows[0];
+
+    const folderResult = await pool.query("SELECT * FROM folders WHERE folderid = $1", [note.folderid]);
+
+    if (folderResult.rows.length > 0) {
+      note.folder = folderResult.rows[0];
+    }
+
+    return NextResponse.json({ note }, { status: 200 });
+
+  }catch (error) {
     console.log("Unable to fetch note by id", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
