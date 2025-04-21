@@ -1,7 +1,8 @@
 import axios from "axios";
 import { FolderType } from "../types/folder";
 
-const API_URL: string = "https://nowted-server.remotestate.com";
+// const API_URL: string = "https://nowted-server.remotestate.com";
+const API_URL:string="http://localhost:3000/api"
 
 
 export const getFolders = async (): Promise<FolderType[]> => {

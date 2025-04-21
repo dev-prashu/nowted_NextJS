@@ -18,6 +18,18 @@ export async function PATCH(
     if (!name) {
       return NextResponse.json({ error: "Name is Requires" }, { status: 400 });
     }
+    const result = await pool.query(
+      "SELECT * FROM folders WHERE userId=$1 AND name=$2 AND deletedAt IS NULL",
+      [userId, name]
+    );
+
+    if (result.rows.length > 0 && result.rows[0].folderid !== folderId) {
+      return NextResponse.json(
+        { error: "Folder with same name Already Exists" },
+        { status: 409 }
+      );
+    }
+
     await pool.query(
       "UPDATE folders SET name= $1 WHERE folderid = $2 AND userid = $3",
       [name, folderId, userId]

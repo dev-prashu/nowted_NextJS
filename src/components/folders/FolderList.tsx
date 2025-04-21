@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 
 function FolderList() {
   const { folderId } = useParams();
@@ -63,11 +63,11 @@ function FolderList() {
   const [newFolderName, setNewFolderName] = useState<string>("");
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
 
-  useEffect(() => {
-    if (!folderId && folders && folders.length > 0) {
-      router.push(`/${folders?.[0]?.id}`);
-    }
-  }, [folders, router, folderId]);
+  // useEffect(() => {
+  //   if (!folderId && folders && folders.length > 0) {
+  //     router.push(`/${folders?.[0]?.id}`);
+  //   }
+  // }, [folders, router, folderId]);
 
   const handleDoubleClick = (folderId: string, folderName: string) => {
     setEditFolderId(folderId);

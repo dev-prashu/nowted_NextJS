@@ -109,6 +109,7 @@ export default function ActiveNote() {
     }
   }, [note, folderId]);
   if (note?.deletedAt || isDeleted) {
+    console.log("note", note);
     return (
       <>
         <RestoreNote note={note} setisDeleted={setisDeleted} />

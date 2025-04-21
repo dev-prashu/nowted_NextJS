@@ -9,10 +9,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const userId = decodeJwt(token!).id as string;
-    const result = await pool.query("SELECT * FROM folders WHERE userId = $1", [
+    const result = await pool.query("SELECT * FROM folders WHERE userId = $1 AND deletedAt IS NULL ORDER BY createdAt DESC", [
       userId,
     ]);
-    return NextResponse.json({folders:result.rows});
+
+    const folders = result.rows.map(folder => ({
+      id: folder.folderid,
+      name: folder.name,
+      createdAt: folder.createdat,
+      updatedAt: folder.updatedat,
+      deletedAt: folder.deletedat
+    }));
+    return NextResponse.json({ folders: folders });
   } catch (error) {
     console.log("Error fetching folders:", error);
     return NextResponse.json(
@@ -37,6 +45,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Folder name is required" },
         { status: 400 }
+      );
+    }
+
+    const result = await pool.query(
+      "SELECT * FROM folders WHERE userId = $1 AND name = $2 AND deletedat IS NULL",
+      [userId, name]
+    );
+
+    if (result.rows.length > 0) {
+      return NextResponse.json(
+        { error: "Folder with this name already exists" },
+        { status: 409 }
       );
     }
     await pool.query("INSERT INTO folders(name,userId) VALUES ($1,$2)", [
